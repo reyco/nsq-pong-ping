@@ -1,0 +1,24 @@
+ping:
+  build: ./ping
+  working_dir: /ping
+  volumes:
+    - ./ping:/ping
+  links:
+    - nsq
+pong:
+  build: ./pong
+  working_dir: /pong
+  volumes:
+    - ./pong:/pong
+  links:
+    - nsq
+nsq:
+  image: nsqio/nsq
+  command: /nsqd
+  name: nsqd
+  expose:
+    - "4150"
+    - "4151"
+  ports:
+    - "4150:4150"
+    - "4151:4151"  
