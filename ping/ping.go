@@ -31,6 +31,7 @@ func receive_pong(){
   q.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
       fmt.Println(string(message.Body))
       wg.Done()
+      time.Sleep(time.Millisecond*500)
       send_ping()
       return nil
   }))
