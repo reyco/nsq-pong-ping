@@ -2,67 +2,69 @@ package main
 
 import (
   "github.com/bitly/go-nsq"
-  "sync"
   "time"
   "fmt"
   "log"
 )
 
 
-var(
-  kaka = true
-)
-
-
-func send_pong(){
-  config := nsq.NewConfig()
-  w, _ := nsq.NewProducer("nsq:4150", config)
-
-  err := w.Publish("bong", []byte("Pong"))
-  if err != nil {
-      log.Panic("Could not connect wala")
-  }
-  fmt.Println("Pong is sent")
-  w.Stop()
-
+type Essence struct{
+  config *nsq.Config
+  sender *nsq.Producer
+  receiver *nsq.Consumer
+  sender_channel string
+  receiver_channel string
+  sender_message string
 }
 
-func receive_ping(){
-  kaka = false
-  wg := &sync.WaitGroup{}
-  wg.Add(1)
 
-  config := nsq.NewConfig()
-  q, _ := nsq.NewConsumer("bing", "ch", config)
-  q.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
-      fmt.Println(string(message.Body), "is received")
-      // wg.Done()
-      send_pong()
-      kaka = true
-      return nil
+func (ess *Essence) init(){
+  ess.sender_channel = "kong"
+  ess.receiver_channel = "king"
+  ess.sender_message = "Pong"
+  ess.config = nsq.NewConfig()
+  ess.sender, _ = nsq.NewProducer("nsq:4150", ess.config) 
+  ess.receiver, _ = nsq.NewConsumer(ess.receiver_channel, "ch", ess.config)
+}
+
+func (ess *Essence) sending(){
+  err := ess.sender.Publish(ess.sender_channel, []byte(ess.sender_message))
+  if err != nil {
+      log.Panic("Could not connect wala nada nothing")
+  }
+  fmt.Println("Ping is sent")
+}
+
+
+func (ess *Essence) receiving(){
+  ess.receiver.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
+    fmt.Println(string(message.Body), "is received")
+    time.Sleep(time.Millisecond * 2500)
+    ess.sending()
+    time.Sleep(time.Millisecond * 2500)
+    return nil
   }))
-  err := q.ConnectToNSQD("nsq:4150")
+  err := ess.receiver.ConnectToNSQD("nsq:4150")
   if err != nil {
-      log.Panic("Could not connect")
+    log.Panic("Could not connect")
   }
-  // wg.Wait()
 }
+
+
+var(
+  ess Essence
+)
 
 
 
 func main() {
-  tickChan := time.NewTicker(time.Millisecond * 400).C
+  ess.init()
+  ess.sending()
+  ess.receiving()
   for {
-    select{
-      case <- tickChan:
-        if kaka{
-	  receive_ping()
-	  time.Sleep(time.Millisecond*5000)
-	}
-    }
+    time.Sleep(time.Millisecond * 5000)
   }
 }
-
 
 
 
