@@ -2,7 +2,6 @@ package main
 
 import (
   "github.com/bitly/go-nsq"
-  "sync"
   "time"
   "fmt"
   "log"
@@ -10,23 +9,19 @@ import (
 
 
 type Essence struct{
-  config *Config
-  sender *Producer
-  receiver *Consumer
+  config *nsq.Config
+  sender *nsq.Producer
+  receiver *nsq.Consumer
 }
 
-var(
-  kaka = true
-)
 
-
-func (ess Essence) init(){
+func (ess *Essence) init(){
   ess.config = nsq.NewConfig()
-  ess.sender, _ := nsq.NewProducer("nsq:4150", ess.config) 
-  ess.receiver, _ := nsq.NewConsumer("bong", "ch", config)
+  ess.sender, _ = nsq.NewProducer("nsq:4150", ess.config) 
+  ess.receiver, _ = nsq.NewConsumer("bong", "ch", ess.config)
 }
 
-func (ess Essence) send_ping(){
+func (ess *Essence) send_ping(){
   err := ess.sender.Publish("bing", []byte("Ping"))
   if err != nil {
       log.Panic("Could not connect wala nada nothing")
@@ -35,7 +30,7 @@ func (ess Essence) send_ping(){
 }
 
 
-func (ess Essence) receive_pong(){
+func (ess *Essence) receive_pong(){
   if kaka{
     kaka = false
     ess.receiver.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
@@ -52,18 +47,19 @@ func (ess Essence) receive_pong(){
 }
 
 
+var(
+  kaka = true
+  ess Essence
+)
+
 
 
 func main() {
-  ess := new(Essence)
   ess.init()
   ess.send_ping()
-  tickChan := time.NewTicker(time.Millisecond * 5000).C
+  // ess.receive_pong()
   for {
-    select{
-      case <- tickChan:
-        ess.receive_pong()
-    }
+    time.Sleep(time.Millisecond * 5000)
   }
 }
 
