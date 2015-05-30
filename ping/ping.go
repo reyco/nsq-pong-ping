@@ -31,18 +31,16 @@ func (ess *Essence) send_ping(){
 
 
 func (ess *Essence) receive_pong(){
-  if kaka{
-    kaka = false
-    ess.receiver.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
-        fmt.Println(string(message.Body), "is received")
-        ess.send_ping()
-        kaka = true
-        return nil
-    }))
-    err := ess.receiver.ConnectToNSQD("nsq:4150")
-    if err != nil {
-        log.Panic("Could not connect")
-    }
+  ess.receiver.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
+    fmt.Println(string(message.Body), "is received")
+    time.Sleep(time.Millisecond * 5000)
+    ess.send_ping()
+    kaka = true
+    return nil
+  }))
+  err := ess.receiver.ConnectToNSQD("nsq:4150")
+  if err != nil {
+    log.Panic("Could not connect")
   }
 }
 
@@ -57,7 +55,7 @@ var(
 func main() {
   ess.init()
   ess.send_ping()
-  // ess.receive_pong()
+  ess.receive_pong()
   for {
     time.Sleep(time.Millisecond * 5000)
   }
