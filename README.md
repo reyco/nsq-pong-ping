@@ -4,19 +4,18 @@ PRACTICE
 WARNING
 -------
 
-Not yet fully running. This is only practice.
+This is only practice.
 
-
-Have trouble with infinite loop to listen on the nsq. Still finding solution.
 
 
 HOW TO RUN
 ----------
 
-
 * docker-compose stop
 * docker-compose up -d
+* **(make a 2nd terminal window to run below)**
 * docker-compose run pong
-* **(make another terminal window to run below)**
+* **(make a 3rd terminal window to run below)**
 * docker-compose run ping
-
+* **( to stop the printing of ping pong just Ctrl+C )**
+* **( to stop all type docker-compose stop )**
