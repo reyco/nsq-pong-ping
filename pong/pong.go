@@ -32,7 +32,7 @@ func (ess *Essence) sending(){
   if err != nil {
       log.Panic("Could not connect wala nada nothing")
   }
-  fmt.Println("Ping is sent")
+  fmt.Println(ess.sender_message+" is sent")
 }
 
 
